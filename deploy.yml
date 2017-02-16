@@ -1,0 +1,11 @@
+---
+- hosts: webservers
+  tasks:
+    - name: get the latest updates from GitHub for phpsrv-apps
+      become: no
+      git:
+        repo: git@github.com:jhu-sheridan-libraries/phpsrv-apps.git
+        dest: /var/www/html
+        key_file: ~/.ssh/github
+        accept_hostkey: yes
+        update: yes
