@@ -1,12 +1,6 @@
 ---
 
 - hosts: webservers
-  pre_tasks:
-    - include_vars:
-        "vars/certs.yml"
-      when: ssl_certificates is defined
-    - include_vars:
-        "vars/github_key.yml"
   tasks:
     - name: Install some packages
       package: name={{item}} state=latest
