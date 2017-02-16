@@ -1,0 +1,12 @@
+- src: https://github.com/jhu-sheridan-libraries/jhu-role-httpd
+  version: master
+  name: jhu_httpd
+
+- src: https://github.com/jhu-sheridan-libraries/jhu-role-php
+  version: master
+  name: jhu_php
+
+- src: https://github.com/jhu-sheridan-libraries/jhu-role-ssl
+  version: master
+  name: jhu_ssl
+

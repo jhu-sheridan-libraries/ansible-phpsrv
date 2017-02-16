@@ -1,0 +1,71 @@
+---
+
+- hosts: webservers
+  pre_tasks:
+    - include_vars:
+        "vars/certs.yml"
+      when: ssl_certificates is defined
+    - include_vars:
+        "vars/github_key.yml"
+  tasks:
+    - name: Install some packages
+      package: name={{item}} state=latest
+      with_items:
+        - git
+    - name: Ensure ~ops/.ssh exists
+      file:
+        path: ~ops/.ssh
+        state: directory
+        mode: 0700
+    - name: Write github key to ~/.ssh/github
+      copy:
+        content: "{{ github_key }}"
+        dest: ~ops/.ssh/github
+        owner: ops
+        group: ops
+        mode: 0600
+
+    - name: Delete html directory
+      file:
+        state: absent
+        path: /var/www/html
+
+    - name: Ensure /var/www/html exists
+      file:
+        state: directory
+        path: "/var/www/html"
+        owner: ops
+        group: ops
+        mode: 0775
+
+    - name: set ACL for ops
+      acl:
+        state: present
+        path: /var/www/html
+        entry: "default:u:ops:rwx"
+    - acl:
+        state: present
+        path: /var/www/html
+        entry: "u:ops:rwx"
+
+    - name: set ACL for msel-libraryapplications
+      acl:
+        state: present
+        path: /var/www/html
+        entry: "default:g:msel-libraryapplications:rwx"
+    - acl:
+        state: present
+        path: /var/www/html
+        entry: "g:msel-libraryapplications:rwx"
+
+    - name: Clone the phpsrv apps
+      become: no
+      git:
+        repo: git@github.com:jhu-sheridan-libraries/phpsrv-apps.git
+        dest: /var/www/html
+        key_file: ~ops/.ssh/github
+        accept_hostkey: yes
+  roles:
+    - { role: jhu_ssl }
+    - { role: jhu_httpd }
+    - { role: jhu_php }
